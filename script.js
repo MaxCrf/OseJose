@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return ['Coeur', 'Carreau'].includes(this.enseigne) ? 'Rouge' : 'Noir';
         }
 
-        // Renvoie une représentation simple pour l'affichage
         toString() {
             return `${this.rang} de ${this.enseigne}`;
         }
@@ -45,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         melanger() {
-            // Algorithme de mélange Fisher-Yates
             for (let i = this.cartes.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [this.cartes[i], this.cartes[j]] = [this.cartes[j], this.cartes[i]];
@@ -56,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
         piocher(nombre = 1) {
             let cartesPiochees = [];
             for (let i = 0; i < nombre; i++) {
-                // On remélange s'il reste moins de 12 cartes (pour le Triple Osé José)
+                // On remélange s'il reste moins de 12 cartes
                 if (this.cartes.length < 12) {
                     console.log("Pas assez de cartes, on remélange le paquet...");
                     this._creerPaquet();
@@ -78,45 +76,37 @@ document.addEventListener('DOMContentLoaded', () => {
             this.paquet = new Paquet();
             this.cartesPiocheesCeTour = [];
             this.aOse = false;
+            this.pariEnAttente = null;
+            this.quantiteEnAttente = 1;
 
-            // Éléments du DOM (interface)
+            // Éléments du DOM
             this.setupScreen = document.getElementById('setup-screen');
             this.gameScreen = document.getElementById('game-screen');
-            
-            // Setup
             this.numJoueursInput = document.getElementById('num-joueurs');
             this.nomsJoueursContainer = document.getElementById('noms-joueurs-container');
             this.btnCommencer = document.getElementById('btn-commencer');
-
-            // Jeu
             this.nomJoueurActuelEl = document.getElementById('nom-joueur-actuel');
             this.compteCartesEl = document.getElementById('compte-cartes');
             this.statutOseEl = document.getElementById('statut-ose');
-            this.cartesPrecedentesEl = document.getElementById('cartes-precedentes');
-            this.cartesResultatEl = document.getElementById('cartes-resultat');
+            this.contexteZoneEl = document.getElementById('contexte-zone');
+            this.dernierTirageEl = document.getElementById('dernier-tirage-zone');
             this.messageTexteEl = document.getElementById('message-texte');
             this.btnRejouer = document.getElementById('btn-rejouer');
             this.parisZone = document.getElementById('paris-zone');
             this.btnArreter = document.getElementById('btn-arreter');
             
             // Modals
+            this.quantiteModal = document.getElementById('quantite-modal');
             this.joseModal = document.getElementById('jose-modal');
-            this.btnJoseRouge = document.getElementById('btn-jose-rouge');
-            this.btnJoseNoir = document.getElementById('btn-jose-noir');
 
-            // Lier les événements
             this.lierEvenementsSetup();
             this.lierEvenementsJeu();
         }
 
         // --- 1. Phase de Configuration ---
-
         lierEvenementsSetup() {
-            // Met à jour le nombre de champs "nom"
             this.numJoueursInput.addEventListener('change', () => this.majNomsInputs());
-            // Commence la partie
             this.btnCommencer.addEventListener('click', () => this.commencerPartie());
-            // Initialise les inputs au chargement
             this.majNomsInputs();
         }
 
@@ -133,269 +123,294 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         commencerPartie() {
-            // Récupère les noms des joueurs
-            const inputs = document.querySelectorAll('.nom-joueur-input');
-            this.joueurs = Array.from(inputs).map(input => input.value || input.placeholder);
-            
+            this.joueurs = Array.from(document.querySelectorAll('.nom-joueur-input')).map(input => input.value || input.placeholder);
             if (this.joueurs.length === 0) return;
-
-            // Cache l'écran de setup et montre l'écran de jeu
             this.setupScreen.classList.remove('active');
             this.gameScreen.classList.add('active');
-
-            // Initialise le premier tour
             this.indexJoueurActuel = 0;
             this.demarrerTour();
         }
 
         // --- 2. Phase de Jeu ---
-
         lierEvenementsJeu() {
-            // Clic sur un bouton de pari
             this.parisZone.addEventListener('click', (e) => {
-                if (e.target.classList.contains('btn-pari')) {
+                if (e.target.classList.contains('btn-pari') && !e.target.disabled) {
                     const pari = e.target.dataset.pari;
                     this.gererPari(pari);
                 }
             });
 
-            // Clic sur "Arrêter"
             this.btnArreter.addEventListener('click', () => this.passerAuJoueurSuivant());
-
-            // Clic sur "Rejouer" (après avoir perdu)
             this.btnRejouer.addEventListener('click', () => this.demarrerTour());
 
-            // Clic sur le choix de couleur pour "José"
-            this.btnJoseRouge.addEventListener('click', () => this.resoudrePariJose('Rouge'));
-            this.btnJoseNoir.addEventListener('click', () => this.resoudrePariJose('Noir'));
+            this.quantiteModal.addEventListener('click', (e) => {
+                if (e.target.classList.contains('btn-quantite')) {
+                    this.quantiteEnAttente = parseInt(e.target.dataset.q, 10);
+                    this.quantiteModal.classList.add('hidden');
+                    
+                    if (this.pariEnAttente === 'josé-couleur') {
+                        this.pariEnAttente = 'josé'; // On le change en "josé"
+                        this.joseModal.classList.remove('hidden'); // On demande la couleur
+                    } else {
+                        this.resoudrePariFinal(this.pariEnAttente, this.quantiteEnAttente, null);
+                    }
+                }
+                if (e.target.id === 'btn-annuler-quantite') {
+                    this.quantiteModal.classList.add('hidden');
+                    this.pariEnAttente = null;
+                }
+            });
+            
+            this.joseModal.addEventListener('click', (e) => {
+                if (e.target.id === 'btn-jose-rouge' || e.target.id === 'btn-jose-noir') {
+                    const couleurAnnoncee = (e.target.id === 'btn-jose-rouge') ? 'Rouge' : 'Noir';
+                    this.joseModal.classList.add('hidden');
+                    // On résout avec la quantité x1 (José est toujours simple)
+                    this.resoudrePariFinal('josé', 1, couleurAnnoncee);
+                }
+            });
         }
 
         demarrerTour() {
-            // Réinitialise l'état du tour
             this.cartesPiocheesCeTour = [];
             this.aOse = false;
-            
-            // Réinitialise l'interface
             this.nomJoueurActuelEl.textContent = `C'est au tour de ${this.joueurs[this.indexJoueurActuel]} !`;
-            this.cartesPrecedentesEl.innerHTML = '<h3>Cartes du tour :</h3>';
-            this.cartesResultatEl.innerHTML = '<h3>Dernier tirage :</h3>';
+            this.dernierTirageEl.innerHTML = '<h3>Dernier Tirage</h3>';
             this.messageTexteEl.textContent = '';
             this.btnRejouer.classList.add('hidden');
             this.parisZone.classList.remove('hidden');
-
             this.mettreAJourInterface();
         }
 
         gererPari(pari) {
-            // Cas spécial pour "José" qui demande une couleur
-            if (pari === 'josé') {
-                this.joseModal.classList.remove('hidden');
-                return; // On attend que le joueur choisisse une couleur
+            if (['rouge', 'noir', 'plus', 'moins', 'intérieur', 'extérieur'].includes(pari)) {
+                this.resoudrePariFinal(pari, 1, null);
+                return;
             }
-
-            // Pour tous les autres paris
-            const { succes, cartesTirees } = this._resoudrePari(pari, null);
-            this.finaliserPari(succes, cartesTirees, pari);
+            
+            if (['purple', 'osé josé', 'josé-couleur'].includes(pari)) {
+                this.pariEnAttente = pari;
+                // Si c'est 'josé', on demande la couleur direct (il est toujours x1)
+                if (pari === 'josé-couleur') {
+                    this.joseModal.classList.remove('hidden');
+                } else {
+                    // Pour Purple et Osé José, on demande la quantité
+                    this.quantiteModal.classList.remove('hidden');
+                }
+            }
         }
 
-        resoudrePariJose(couleurAnnoncee) {
-            // Cache la pop-up
-            this.joseModal.classList.add('hidden');
+        resoudrePariFinal(pari, quantite, extraData) {
+            const { succes, groupesDeCartes, estOse } = this._resoudrePari(pari, quantite, extraData);
             
-            // Résout le pari "José" maintenant qu'on a la couleur
-            const { succes, cartesTirees } = this._resoudrePari('josé', couleurAnnoncee);
-            this.finaliserPari(succes, cartesTirees, 'josé');
-        }
-
-        finaliserPari(succes, cartesTirees, pari) {
-            // Affiche les cartes tirées
-            this._afficherCartes(cartesTirees, this.cartesResultatEl);
+            this._afficherCartesEnRangees(groupesDeCartes, this.dernierTirageEl);
             
-            // Ajoute les cartes au total du tour
+            const cartesTirees = groupesDeCartes.flat();
             this.cartesPiocheesCeTour.push(...cartesTirees);
-            this._afficherCartes(this.cartesPiocheesCeTour, this.cartesPrecedentesEl, true);
 
             if (succes) {
                 this._afficherMessage("...RÉUSSI !", true);
-                
-                // Met à jour le statut "Osé"
-                if (['purple', 'josé', 'osé josé', 'double purple', 'triple purple', 'double osé josé', 'triple osé josé'].includes(pari)) {
+                if (estOse) {
                     this.aOse = true;
                 }
-                
             } else {
-                // Le joueur a perdu
                 const gorgees = this.cartesPiocheesCeTour.length;
                 this._afficherMessage(`...RATÉ ! ${this.joueurs[this.indexJoueurActuel]} doit boire ${gorgees} gorgée(s).`, false);
                 this.gererPerte();
             }
             
-            // Met à jour les boutons, le statut "Osé", etc.
             this.mettreAJourInterface();
         }
 
         gererPerte() {
-            // Le joueur a perdu, il ne peut plus parier
             this.parisZone.classList.add('hidden');
             this.btnArreter.classList.add('hidden');
-            
-            // Il doit cliquer pour rejouer (son tour recommence)
             this.btnRejouer.classList.remove('hidden');
         }
 
         passerAuJoueurSuivant() {
-            // Le joueur s'arrête, on passe au suivant
             this.indexJoueurActuel = (this.indexJoueurActuel + 1) % this.joueurs.length;
             this._afficherMessage(`Tour suivant...`, true);
-            
-            // On utilise un petit délai pour que le joueur voie le message
-            setTimeout(() => {
-                this.demarrerTour();
-            }, 1500);
+            setTimeout(() => this.demarrerTour(), 1500);
         }
 
-        // --- Logique de Résolution des Paris (le "moteur" du jeu) ---
+        // --- Logique de Résolution (Logique Totale + Affichage Trié) ---
+        
+        _resoudrePari(pari, quantite, extraData) {
+            let groupesDeCartes = [];
+            let succes = false;
+            let estOse = false;
 
-       _resoudrePari(pari, extraData) {
             try {
-                // --- Paris inchangés ---
-                if (pari === 'rouge') {
+                // --- Paris simples ---
+                if (pari === 'rouge' || pari === 'noir') {
                     const carte = this.paquet.piocher(1)[0];
-                    return { succes: carte.couleur_rb === 'Rouge', cartesTirees: [carte] };
+                    succes = (pari === 'rouge') ? (carte.couleur_rb === 'Rouge') : (carte.couleur_rb === 'Noir');
+                    groupesDeCartes = [[carte]];
                 }
-                if (pari === 'noir') {
-                    const carte = this.paquet.piocher(1)[0];
-                    return { succes: carte.couleur_rb === 'Noir', cartesTirees: [carte] };
-                }
-                if (pari === 'plus') {
+                // --- Paris de contexte ---
+                else if (pari === 'plus' || pari === 'moins') {
                     const prec = this.cartesPiocheesCeTour[this.cartesPiocheesCeTour.length - 1];
                     const carte = this.paquet.piocher(1)[0];
-                    return { succes: carte.valeur > prec.valeur, cartesTirees: [carte] };
+                    succes = (pari === 'plus') ? (carte.valeur > prec.valeur) : (carte.valeur < prec.valeur);
+                    groupesDeCartes = [[carte]];
                 }
-                if (pari === 'moins') {
-                    const prec = this.cartesPiocheesCeTour[this.cartesPiocheesCeTour.length - 1];
-                    const carte = this.paquet.piocher(1)[0];
-                    return { succes: carte.valeur < prec.valeur, cartesTirees: [carte] };
-                }
-                if (pari === 'intérieur' || pari === 'extérieur') {
+                else if (pari === 'intérieur' || pari === 'extérieur') {
                     const a = this.cartesPiocheesCeTour[this.cartesPiocheesCeTour.length - 1];
                     const b = this.cartesPiocheesCeTour[this.cartesPiocheesCeTour.length - 2];
                     const low = Math.min(a.valeur, b.valeur);
                     const high = Math.max(a.valeur, b.valeur);
                     const carte = this.paquet.piocher(1)[0];
-                    let succes;
-                    if (pari === 'intérieur') {
-                        succes = carte.valeur > low && carte.valeur < high;
-                    } else { // extérieur
-                        succes = carte.valeur < low || carte.valeur > high;
-                    }
-                    return { succes: succes, cartesTirees: [carte] };
-                }
-                if (pari === 'purple') {
-                    const cartes = this.paquet.piocher(2);
-                    const succes = cartes[0].couleur_rb !== cartes[1].couleur_rb;
-                    return { succes: succes, cartesTirees: cartes };
-                }
-                if (pari === 'josé') {
-                    const cartes = this.paquet.piocher(3);
-                    const succes_purple = cartes[0].couleur_rb !== cartes[1].couleur_rb;
-                    const succes_couleur = cartes[2].couleur_rb === extraData;
-                    return { succes: succes_purple && succes_couleur, cartesTirees: cartes };
-                }
-                if (pari === 'osé josé') {
-                    const cartes = this.paquet.piocher(4);
-                    const rouges = cartes.filter(c => c.couleur_rb === 'Rouge').length;
-                    const succes = rouges === 1 || rouges === 3;
-                    return { succes: succes, cartesTirees: cartes };
+                    if (pari === 'intérieur') { succes = carte.valeur > low && carte.valeur < high; }
+                    else { succes = carte.valeur < low || carte.valeur > high; }
+                    groupesDeCartes = [[carte]];
                 }
                 
-                // --- MODIFIÉ : Logique des paris multiples ---
-
-                if (pari === 'double purple') {
-                    const cartes = this.paquet.piocher(4);
-                    // On compte le total : 2 Rouges (et donc 2 Noires)
-                    const rouges = cartes.filter(c => c.couleur_rb === 'Rouge').length;
-                    const succes = rouges === 2;
-                    return { succes: succes, cartesTirees: cartes };
+                // --- Pari "José" (cas spécial) ---
+                else if (pari === 'josé') {
+                    estOse = true;
+                    const cartes = this.paquet.piocher(3);
+                    // Affichage : [Paire], [Carte seule]
+                    groupesDeCartes = [[cartes[0], cartes[1]], [cartes[2]]]; 
+                    const succes_purple = cartes[0].couleur_rb !== cartes[1].couleur_rb;
+                    const succes_couleur = cartes[2].couleur_rb === extraData;
+                    succes = succes_purple && succes_couleur;
                 }
 
-                if (pari === 'triple purple') {
-                    const cartes = this.paquet.piocher(6);
-                    // On compte le total : 3 Rouges (et donc 3 Noires)
-                    const rouges = cartes.filter(c => c.couleur_rb === 'Rouge').length;
-                    const succes = rouges === 3;
-                    return { succes: succes, cartesTirees: cartes };
-                }
+                // --- Pari "Purple" (Logique Totale + Affichage en Paires) ---
+                else if (pari === 'purple') {
+                    estOse = true;
+                    const cartes = this.paquet.piocher(quantite * 2);
+                    const totalRouges = cartes.filter(c => c.couleur_rb === 'Rouge').length;
+                    
+                    // Logique : Gagne s'il y a 50/50
+                    succes = (totalRouges === quantite); 
 
-                if (pari === 'double osé josé') {
-                    const cartes = this.paquet.piocher(8);
-                    // On compte le total : 2, 4, ou 6 Rouges
-                    const rouges = cartes.filter(c => c.couleur_rb === 'Rouge').length;
-                    const succes = rouges === 2 || rouges === 4 || rouges === 6;
-                    return { succes: succes, cartesTirees: cartes };
+                    // Affichage : en paires
+                    for (let i = 0; i < quantite; i++) {
+                        groupesDeCartes.push(cartes.slice(i * 2, (i * 2) + 2));
+                    }
                 }
+                
+                // --- Pari "Osé José" (Logique Totale + Affichage Trié) ---
+                else if (pari === 'osé josé') {
+                    estOse = true;
+                    const cartes = this.paquet.piocher(quantite * 4);
+                    const totalRouges = cartes.filter(c => c.couleur_rb === 'Rouge').length;
 
-                if (pari === 'triple osé josé') {
-                    const cartes = this.paquet.piocher(12);
-                    // On compte le total : 3, 5, 7, ou 9 Rouges (on suit la logique)
-                    const rouges = cartes.filter(c => c.couleur_rb === 'Rouge').length;
-                    const succes = rouges === 3 || rouges === 5 || rouges === 7 || rouges === 9;
-                    return { succes: succes, cartesTirees: cartes };
+                    // 1. Logique (basée sur le total)
+                    if (quantite === 1) { 
+                        succes = totalRouges === 1 || totalRouges === 3;
+                    } else if (quantite === 2) {
+                        succes = totalRouges === 2 || totalRouges === 4 || totalRouges === 6;
+                    } else if (quantite === 3) {
+                        succes = totalRouges === 3 || totalRouges === 5 || totalRouges === 7 || totalRouges === 9;
+                    }
+
+                    // 2. Affichage (trié pour la lisibilité)
+                    let cartesRouges = cartes.filter(c => c.couleur_rb === 'Rouge');
+                    let cartesNoires = cartes.filter(c => c.couleur_rb === 'Noir');
+                    
+                    for (let i = 0; i < quantite; i++) {
+                        let groupeActuel = [];
+                        // Tente de faire une rangée 3R/1N
+                        if (cartesRouges.length >= 3 && cartesNoires.length >= 1) {
+                            groupeActuel = [...cartesRouges.splice(0, 3), cartesNoires.pop()];
+                        }
+                        // Tente de faire une rangée 1R/3N
+                        else if (cartesRouges.length >= 1 && cartesNoires.length >= 3) {
+                            groupeActuel = [cartesRouges.pop(), ...cartesNoires.splice(0, 3)];
+                        }
+                        // Echec, on prend 4 cartes restantes
+                        else {
+                            let cartesRestantes = [...cartesRouges, ...cartesNoires];
+                            groupeActuel = cartesRestantes.splice(0, 4);
+                            cartesRouges = cartesRestantes.filter(c => c.couleur_rb === 'Rouge');
+                            cartesNoires = cartesRestantes.filter(c => c.couleur_rb === 'Noir');
+                        }
+                        groupesDeCartes.push(groupeActuel);
+                    }
                 }
 
             } catch (e) {
                 console.error("Erreur lors de la résolution du pari:", e);
-                return { succes: false, cartesTirees: [] }; // Sécurité
+                return { succes: false, groupesDeCartes: [], estOse: false };
             }
-            return { succes: false, cartesTirees: [] }; // Pari non reconnu
+            return { succes, groupesDeCartes, estOse };
         }
-
 
         // --- Fonctions d'aide pour l'Interface ---
 
         mettreAJourInterface() {
             const numCartes = this.cartesPiocheesCeTour.length;
-            
-            // Met à jour le compteur de cartes
             this.compteCartesEl.textContent = `Cartes piochées ce tour : ${numCartes}`;
-            
-            // Met à jour le statut "Osé"
             this.statutOseEl.classList.toggle('hidden', !this.aOse);
 
-            // Gère la visibilité des boutons
-            document.querySelectorAll('#paris-tour2 button').forEach(btn => 
-                btn.disabled = numCartes < 1
-            );
-            document.querySelectorAll('#paris-tour3 button').forEach(btn => 
-                btn.disabled = numCartes < 2
-            );
+            const btnPlus = document.querySelector("[data-pari='plus']");
+            const btnMoins = document.querySelector("[data-pari='moins']");
+            const btnInterieur = document.querySelector("[data-pari='intérieur']");
+            const btnExterieur = document.querySelector("[data-pari='extérieur']");
+
+            btnPlus.disabled = numCartes < 1;
+            btnMoins.disabled = numCartes < 1;
+            btnInterieur.disabled = numCartes < 2;
+            btnExterieur.disabled = numCartes < 2;
             
-            // Le joueur peut-il s'arrêter ?
-            // OUI, si il a 4 cartes OU PLUS, ET s'il a "Osé"
+            this._afficherCartesDeContexte();
+
             const peutArreter = numCartes >= 4 && this.aOse;
             this.btnArreter.classList.toggle('hidden', !peutArreter);
         }
-
-        _afficherCartes(cartes, elementCible, estHistorique = false) {
-            // Gère le titre de la section
-            const titre = estHistorique ? '<h3>Cartes du tour :</h3>' : '<h3>Dernier tirage :</h3>';
-            elementCible.innerHTML = titre;
+        
+        _afficherCartesEnRangees(groupesDeCartes, elementCible) {
+            elementCible.innerHTML = '<h3>Dernier Tirage</h3>';
             
-            // Crée et ajoute les éléments de carte
-            cartes.forEach(carte => {
-                const carteEl = document.createElement('div');
-                carteEl.className = `carte ${carte.couleur_rb === 'Rouge' ? 'rouge' : 'noir'}`;
-                
-                const rangEl = document.createElement('strong');
-                rangEl.textContent = carte.rang;
-                
-                const enseigneEl = document.createElement('span');
-                enseigneEl.textContent = carte.enseigne;
-
-                carteEl.appendChild(rangEl);
-                carteEl.appendChild(enseigneEl);
-                elementCible.appendChild(carteEl);
+            groupesDeCartes.forEach(groupe => {
+                const rangeeEl = document.createElement('div');
+                rangeeEl.className = 'carte-rangee';
+                groupe.forEach(carte => {
+                    rangeeEl.appendChild(this._creerElementCarte(carte));
+                });
+                elementCible.appendChild(rangeeEl);
             });
+        }
+        
+        _afficherCartesDeContexte() {
+            this.contexteZoneEl.innerHTML = '<h3>Cartes de Contexte</h3>';
+            const numCartes = this.cartesPiocheesCeTour.length;
+
+            if (numCartes === 0) {
+                this.contexteZoneEl.innerHTML += '<p style="opacity: 0.5;">(Aucune carte piochée)</p>';
+                return;
+            }
+            
+            const cartesContexte = (numCartes >= 2) 
+                ? this.cartesPiocheesCeTour.slice(-2)
+                : this.cartesPiocheesCeTour.slice(-1);
+
+            cartesContexte.forEach(carte => {
+                this.contexteZoneEl.appendChild(this._creerElementCarte(carte, true)); // 'true' pour petite
+            });
+        }
+        
+        _creerElementCarte(carte, estPetite = false) {
+            const carteEl = document.createElement('div');
+            carteEl.className = `carte ${carte.couleur_rb === 'Rouge' ? 'rouge' : 'noir'}`;
+            if (estPetite) {
+                // Applique le style pour les petites cartes
+                carteEl.style.width = '60px'; 
+                carteEl.style.height = '90px';
+                carteEl.style.fontSize = '1em';
+            }
+            
+            const rangEl = document.createElement('strong');
+            rangEl.textContent = carte.rang;
+            const enseigneEl = document.createElement('span');
+            enseigneEl.textContent = carte.enseigne;
+
+            carteEl.appendChild(rangEl);
+            carteEl.appendChild(enseigneEl);
+            return carteEl;
         }
 
         _afficherMessage(texte, succes) {
@@ -406,5 +421,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Lancement du jeu ---
     const jeu = new JeuOseJose();
-
 });
