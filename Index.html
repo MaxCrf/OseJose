@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Osé José - Le Jeu</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="setup-screen" class="ecran active">
+        <h1>Osé José !</h1>
+        <p>L'extermination va commencer.</p>
+        
+        <div class="input-groupe">
+            <label for="num-joueurs">Combien de joueurs ?</label>
+            <input type="number" id="num-joueurs" min="1" max="8" value="2">
+        </div>
+        
+        <div id="noms-joueurs-container">
+            </div>
+        
+        <button id="btn-commencer" class="btn-principal">Commencer la partie</button>
+    </div>
+
+    <div id="game-screen" class="ecran">
+        
+        <div id="info-zone">
+            <h2 id="nom-joueur-actuel">C'est au tour de...</h2>
+            <p id="compte-cartes">Cartes piochées ce tour : 0</p>
+            <p id="statut-ose" class="hidden">Vous avez "Osé" !</p>
+        </div>
+
+        <div id="cartes-zone">
+            <div id="cartes-precedentes" class="cartes-container">
+                <h3>Cartes du tour :</h3>
+                </div>
+            <div id="cartes-resultat" class="cartes-container">
+                <h3>Dernier tirage :</h3>
+                </div>
+        </div>
+
+        <div id="message-zone">
+            <h3 id="message-texte"></h3>
+            <button id="btn-rejouer" class="btn-action hidden">J'ai bu, je rejoue !</button>
+        </div>
+
+        <div id="paris-zone">
+            <div id="paris-base" class="groupe-boutons">
+                <button class="btn-pari" data-pari="rouge">Rouge</button>
+                <button class="btn-pari" data-pari="noir">Noir</button>
+                <button class="btn-pari ose" data-pari="purple">Purple (2)</button>
+                <button class="btn-pari ose" data-pari="josé">José (3)</button>
+                <button class="btn-pari ose" data-pari="osé josé">Osé José (4)</button>
+            </div>
+            <div id="paris-multi" class="groupe-boutons">
+                <button class="btn-pari ose" data-pari="double purple">Double Purple (4)</button>
+                <button class="btn-pari ose" data-pari="triple purple">Triple Purple (6)</button>
+                <button class="btn-pari ose" data-pari="double osé josé">Double Osé José (8)</button>
+                <button class="btn-pari ose" data-pari="triple osé josé">Triple Osé José (12)</button>
+            </div>
+            <div id="paris-tour2" class="groupe-boutons">
+                <button class="btn-pari" data-pari="plus">Plus</button>
+                <button class="btn-pari" data-pari="moins">Moins</button>
+            </div>
+            <div id="paris-tour3" class="groupe-boutons">
+                <button class="btn-pari" data-pari="intérieur">Intérieur</button>
+                <button class="btn-pari" data-pari="extérieur">Extérieur</button>
+            </div>
+        </div>
+        
+        <div id="action-zone">
+            <button id="btn-arreter" class="btn-principal hidden">Arrêter et passer</button>
+        </div>
+
+    </div>
+    
+    <div id="jose-modal" class="modal hidden">
+        <div class="modal-contenu">
+            <p>Annoncez la couleur de la 3ème carte :</p>
+            <button id="btn-jose-rouge" class="btn-pari">Rouge</button>
+            <button id="btn-jose-noir" class="btn-pari">Noir</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
