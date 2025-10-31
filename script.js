@@ -38,7 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         _creerPaquet() {
-            const enseignes = ['Coeur', 'Carreau', 'Trèfle', 'Pique'];
+            // Note : j'ai changé "Trèfle" en "Trefle" pour être cohérent avec votre demande d'images
+            const enseignes = ['Coeur', 'Carreau', 'Trefle', 'Pique']; 
             const rangs = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Valet', 'Dame', 'Roi', 'As'];
             this.cartes = enseignes.flatMap(e => rangs.map(r => new Carte(e, r)));
         }
@@ -54,7 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
         piocher(nombre = 1) {
             let cartesPiochees = [];
             for (let i = 0; i < nombre; i++) {
-                // On remélange s'il reste moins de 12 cartes
                 if (this.cartes.length < 12) {
                     console.log("Pas assez de cartes, on remélange le paquet...");
                     this._creerPaquet();
@@ -190,11 +190,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (['purple', 'osé josé', 'josé-couleur'].includes(pari)) {
                 this.pariEnAttente = pari;
-                // Si c'est 'josé', on demande la couleur direct (il est toujours x1)
                 if (pari === 'josé-couleur') {
                     this.joseModal.classList.remove('hidden');
                 } else {
-                    // Pour Purple et Osé José, on demande la quantité
                     this.quantiteModal.classList.remove('hidden');
                 }
             }
@@ -270,7 +268,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (pari === 'josé') {
                     estOse = true;
                     const cartes = this.paquet.piocher(3);
-                    // Affichage : [Paire], [Carte seule]
                     groupesDeCartes = [[cartes[0], cartes[1]], [cartes[2]]]; 
                     const succes_purple = cartes[0].couleur_rb !== cartes[1].couleur_rb;
                     const succes_couleur = cartes[2].couleur_rb === extraData;
@@ -283,10 +280,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const cartes = this.paquet.piocher(quantite * 2);
                     const totalRouges = cartes.filter(c => c.couleur_rb === 'Rouge').length;
                     
-                    // Logique : Gagne s'il y a 50/50
                     succes = (totalRouges === quantite); 
 
-                    // Affichage : en paires
                     for (let i = 0; i < quantite; i++) {
                         groupesDeCartes.push(cartes.slice(i * 2, (i * 2) + 2));
                     }
@@ -298,7 +293,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const cartes = this.paquet.piocher(quantite * 4);
                     const totalRouges = cartes.filter(c => c.couleur_rb === 'Rouge').length;
 
-                    // 1. Logique (basée sur le total)
                     if (quantite === 1) { 
                         succes = totalRouges === 1 || totalRouges === 3;
                     } else if (quantite === 2) {
@@ -307,21 +301,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         succes = totalRouges === 3 || totalRouges === 5 || totalRouges === 7 || totalRouges === 9;
                     }
 
-                    // 2. Affichage (trié pour la lisibilité)
                     let cartesRouges = cartes.filter(c => c.couleur_rb === 'Rouge');
                     let cartesNoires = cartes.filter(c => c.couleur_rb === 'Noir');
                     
                     for (let i = 0; i < quantite; i++) {
                         let groupeActuel = [];
-                        // Tente de faire une rangée 3R/1N
                         if (cartesRouges.length >= 3 && cartesNoires.length >= 1) {
                             groupeActuel = [...cartesRouges.splice(0, 3), cartesNoires.pop()];
                         }
-                        // Tente de faire une rangée 1R/3N
                         else if (cartesRouges.length >= 1 && cartesNoires.length >= 3) {
                             groupeActuel = [cartesRouges.pop(), ...cartesNoires.splice(0, 3)];
                         }
-                        // Echec, on prend 4 cartes restantes
                         else {
                             let cartesRestantes = [...cartesRouges, ...cartesNoires];
                             groupeActuel = cartesRestantes.splice(0, 4);
@@ -393,20 +383,22 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
         
+        // --- MODIFIÉ : Recrée les <div> de carte au lieu des <img> ---
         _creerElementCarte(carte, estPetite = false) {
             const carteEl = document.createElement('div');
+            // On utilise les classes de votre fichier style.css
             carteEl.className = `carte ${carte.couleur_rb === 'Rouge' ? 'rouge' : 'noir'}`;
-            if (estPetite) {
-                // Applique le style pour les petites cartes
-                carteEl.style.width = '60px'; 
-                carteEl.style.height = '90px';
-                carteEl.style.fontSize = '1em';
-            }
             
+            if (estPetite) {
+                carteEl.classList.add('petite'); // Le CSS va la rendre plus petite
+            }
+
             const rangEl = document.createElement('strong');
             rangEl.textContent = carte.rang;
+            
             const enseigneEl = document.createElement('span');
-            enseigneEl.textContent = carte.enseigne;
+            // J'ai corrigé "Trèfle" en "Trefle" pour correspondre au paquet
+            enseigneEl.textContent = carte.enseigne; 
 
             carteEl.appendChild(rangEl);
             carteEl.appendChild(enseigneEl);
