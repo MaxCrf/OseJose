@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Osé José - Le Jeu</title>
+    <title>Osé José - NÉON</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    
+    <div id="background-animation"></div>
 
     <div id="setup-screen" class="ecran active">
         <h1>Osé José !</h1>
-        <p>L'extermination va commencer.</p>
+        <p class="neon-subtitle">ÉDITION NÉON</p>
         
         <div class="input-groupe">
             <label for="num-joueurs">Combien de joueurs ?</label>
@@ -31,41 +34,34 @@
             <p id="statut-ose" class="hidden">Vous avez "Osé" !</p>
         </div>
 
-        <div id="cartes-zone">
-            <div id="cartes-precedentes" class="cartes-container">
-                <h3>Cartes du tour :</h3>
-                </div>
-            <div id="cartes-resultat" class="cartes-container">
-                <h3>Dernier tirage :</h3>
-                </div>
-        </div>
+        <div id="contexte-zone" class="cartes-container-simple">
+            <h3>Cartes de Contexte</h3>
+            </div>
 
+        <div id="dernier-tirage-zone" class="cartes-container-rangees">
+            <h3>Dernier Tirage</h3>
+            </div>
+        
         <div id="message-zone">
             <h3 id="message-texte"></h3>
             <button id="btn-rejouer" class="btn-action hidden">J'ai bu, je rejoue !</button>
         </div>
 
         <div id="paris-zone">
-            <div id="paris-base" class="groupe-boutons">
+            <div class="groupe-boutons">
+                <h3>Paris Classiques</h3>
                 <button class="btn-pari" data-pari="rouge">Rouge</button>
                 <button class="btn-pari" data-pari="noir">Noir</button>
-                <button class="btn-pari ose" data-pari="purple">Purple (2)</button>
-                <button class="btn-pari ose" data-pari="josé">José (3)</button>
-                <button class="btn-pari ose" data-pari="osé josé">Osé José (4)</button>
+                <button class="btn-pari" data-pari="plus" disabled>Plus</button>
+                <button class="btn-pari" data-pari="moins" disabled>Moins</button>
+                <button class="btn-pari" data-pari="intérieur" disabled>Intérieur</button>
+                <button class="btn-pari" data-pari="extérieur" disabled>Extérieur</button>
             </div>
-            <div id="paris-multi" class="groupe-boutons">
-                <button class="btn-pari ose" data-pari="double purple">Double Purple (4)</button>
-                <button class="btn-pari ose" data-pari="triple purple">Triple Purple (6)</button>
-                <button class="btn-pari ose" data-pari="double osé josé">Double Osé José (8)</button>
-                <button class="btn-pari ose" data-pari="triple osé josé">Triple Osé José (12)</button>
-            </div>
-            <div id="paris-tour2" class="groupe-boutons">
-                <button class="btn-pari" data-pari="plus">Plus</button>
-                <button class="btn-pari" data-pari="moins">Moins</button>
-            </div>
-            <div id="paris-tour3" class="groupe-boutons">
-                <button class="btn-pari" data-pari="intérieur">Intérieur</button>
-                <button class="btn-pari" data-pari="extérieur">Extérieur</button>
+            <div class="groupe-boutons">
+                <h3>Paris "Osé"</h3>
+                <button class="btn-pari ose" data-pari="purple">Purple</button>
+                <button class="btn-pari ose" data-pari="josé-couleur">José</button>
+                <button class="btn-pari ose" data-pari="osé josé">Osé José</button>
             </div>
         </div>
         
@@ -73,6 +69,16 @@
             <button id="btn-arreter" class="btn-principal hidden">Arrêter et passer</button>
         </div>
 
+    </div>
+    
+    <div id="quantite-modal" class="modal hidden">
+        <div class="modal-contenu">
+            <p>Choisir la quantité :</p>
+            <button class="btn-quantite btn-pari" data-q="1">Simple (x1)</button>
+            <button class="btn-quantite btn-pari" data-q="2">Double (x2)</button>
+            <button class="btn-quantite btn-pari" data-q="3">Triple (x3)</button>
+            <button id="btn-annuler-quantite" class="btn-pari">Annuler</button>
+        </div>
     </div>
     
     <div id="jose-modal" class="modal hidden">
