@@ -84,8 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.sndClick = new Audio('sons/click.mp3');
                 this.sndWin = new Audio('sons/win.mp3');
                 this.sndLose = new Audio('sons/lose.mp3');
-                this.sndAmbiance = new Audio('sons/ambiance.mp3'); // NOUVEAU
-                this.sndAmbiance.loop = true; // Pour que la musique tourne
+                this.sndAmbiance = new Audio('sons/ambiance.mp3');
+                this.sndAmbiance.loop = true; 
                 
                 this.sndClick.onerror = () => console.log("Erreur: Fichier click.mp3 introuvable");
                 this.sndWin.onerror = () => console.log("Erreur: Fichier win.mp3 introuvable");
@@ -145,8 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.gameScreen.classList.add('active');
             this.indexJoueurActuel = 0;
 
-            // NOUVEAU : Démarrer la musique d'ambiance
-            this.sndAmbiance?.play().catch(e => console.log("L'autoplay de l'ambiance a été bloqué par le navigateur."));
+            this.sndAmbiance?.play().catch(e => console.log("L'autoplay de l'ambiance a été bloqué."));
 
             this.demarrerTour();
         }
@@ -385,7 +384,9 @@ document.addEventListener('DOMContentLoaded', () => {
             this._afficherCartesDeContexte();
 
             const peutArreter = numCartes >= 4 && this.aOse;
-            this.btnArreter.classList.toggle('hidden', !peuxArreter);
+            // --- CORRECTION DU BUG ---
+            // 'peuxArreter' a été remplacé par 'peutArreter'
+            this.btnArreter.classList.toggle('hidden', !peutArreter);
         }
         
         _afficherCartesEnRangees(groupesDeCartes, elementCible) {
@@ -447,4 +448,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Lancement du jeu ---
     const jeu = new JeuOseJose();
 
-});
+}); // <-- L'accolade en trop est bien supprimée ici.
