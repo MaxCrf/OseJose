@@ -38,7 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         _creerPaquet() {
-            // Note : j'ai changé "Trèfle" en "Trefle" pour être cohérent avec votre demande d'images
             const enseignes = ['Coeur', 'Carreau', 'Trefle', 'Pique']; 
             const rangs = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Valet', 'Dame', 'Roi', 'As'];
             this.cartes = enseignes.flatMap(e => rangs.map(r => new Carte(e, r)));
@@ -78,6 +77,23 @@ document.addEventListener('DOMContentLoaded', () => {
             this.aOse = false;
             this.pariEnAttente = null;
             this.quantiteEnAttente = 1;
+            this.gorgeesEnJeu = 0;
+
+            // Pré-chargement des sons
+            try {
+                this.sndClick = new Audio('sons/click.mp3');
+                this.sndWin = new Audio('sons/win.mp3');
+                this.sndLose = new Audio('sons/lose.mp3');
+                this.sndAmbiance = new Audio('sons/ambiance.mp3'); // NOUVEAU
+                this.sndAmbiance.loop = true; // Pour que la musique tourne
+                
+                this.sndClick.onerror = () => console.log("Erreur: Fichier click.mp3 introuvable");
+                this.sndWin.onerror = () => console.log("Erreur: Fichier win.mp3 introuvable");
+                this.sndLose.onerror = () => console.log("Erreur: Fichier lose.mp3 introuvable");
+                this.sndAmbiance.onerror = () => console.log("Erreur: Fichier ambiance.mp3 introuvable");
+            } catch (e) {
+                console.error("Impossible de charger les sons:", e);
+            }
 
             // Éléments du DOM
             this.setupScreen = document.getElementById('setup-screen');
@@ -128,6 +144,10 @@ document.addEventListener('DOMContentLoaded', () => {
             this.setupScreen.classList.remove('active');
             this.gameScreen.classList.add('active');
             this.indexJoueurActuel = 0;
+
+            // NOUVEAU : Démarrer la musique d'ambiance
+            this.sndAmbiance?.play().catch(e => console.log("L'autoplay de l'ambiance a été bloqué par le navigateur."));
+
             this.demarrerTour();
         }
 
@@ -135,22 +155,30 @@ document.addEventListener('DOMContentLoaded', () => {
         lierEvenementsJeu() {
             this.parisZone.addEventListener('click', (e) => {
                 if (e.target.classList.contains('btn-pari') && !e.target.disabled) {
+                    this.sndClick?.play().catch(e => console.log("Erreur son clic"));
                     const pari = e.target.dataset.pari;
                     this.gererPari(pari);
                 }
             });
 
-            this.btnArreter.addEventListener('click', () => this.passerAuJoueurSuivant());
-            this.btnRejouer.addEventListener('click', () => this.demarrerTour());
+            this.btnArreter.addEventListener('click', () => {
+                this.sndClick?.play().catch(e => console.log("Erreur son clic"));
+                this.passerAuJoueurSuivant();
+            });
+            this.btnRejouer.addEventListener('click', () => {
+                this.sndClick?.play().catch(e => console.log("Erreur son clic"));
+                this.demarrerTour();
+            });
 
             this.quantiteModal.addEventListener('click', (e) => {
+                this.sndClick?.play().catch(e => console.log("Erreur son clic"));
                 if (e.target.classList.contains('btn-quantite')) {
                     this.quantiteEnAttente = parseInt(e.target.dataset.q, 10);
                     this.quantiteModal.classList.add('hidden');
                     
                     if (this.pariEnAttente === 'josé-couleur') {
-                        this.pariEnAttente = 'josé'; // On le change en "josé"
-                        this.joseModal.classList.remove('hidden'); // On demande la couleur
+                        this.pariEnAttente = 'josé'; 
+                        this.joseModal.classList.remove('hidden'); 
                     } else {
                         this.resoudrePariFinal(this.pariEnAttente, this.quantiteEnAttente, null);
                     }
@@ -162,10 +190,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             
             this.joseModal.addEventListener('click', (e) => {
+                this.sndClick?.play().catch(e => console.log("Erreur son clic"));
                 if (e.target.id === 'btn-jose-rouge' || e.target.id === 'btn-jose-noir') {
                     const couleurAnnoncee = (e.target.id === 'btn-jose-rouge') ? 'Rouge' : 'Noir';
                     this.joseModal.classList.add('hidden');
-                    // On résout avec la quantité x1 (José est toujours simple)
                     this.resoudrePariFinal('josé', 1, couleurAnnoncee);
                 }
             });
@@ -175,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.cartesPiocheesCeTour = [];
             this.aOse = false;
             this.nomJoueurActuelEl.textContent = `C'est au tour de ${this.joueurs[this.indexJoueurActuel]} !`;
-            this.dernierTirageEl.innerHTML = '<h3>Dernier Tirage</h3>';
+            this.dernierTirageEl.innerHTML = '<h3>Tirage actuel</h3>';
             this.messageTexteEl.textContent = '';
             this.btnRejouer.classList.add('hidden');
             this.parisZone.classList.remove('hidden');
@@ -207,13 +235,17 @@ document.addEventListener('DOMContentLoaded', () => {
             this.cartesPiocheesCeTour.push(...cartesTirees);
 
             if (succes) {
+                this.sndWin?.play().catch(e => console.log("Erreur son victoire"));
                 this._afficherMessage("...RÉUSSI !", true);
                 if (estOse) {
                     this.aOse = true;
                 }
             } else {
-                const gorgees = this.cartesPiocheesCeTour.length;
-                this._afficherMessage(`...RATÉ ! ${this.joueurs[this.indexJoueurActuel]} doit boire ${gorgees} gorgée(s).`, false);
+                this.sndLose?.play().catch(e => console.log("Erreur son défaite"));
+                const gorgeesLocales = this.cartesPiocheesCeTour.length;
+                const gorgeesTotales = this.gorgeesEnJeu + gorgeesLocales;
+
+                this._afficherMessage(`...RATÉ ! ${this.joueurs[this.indexJoueurActuel]} doit boire ${gorgeesTotales} gorgée(s).`, false);
                 this.gererPerte();
             }
             
@@ -224,9 +256,12 @@ document.addEventListener('DOMContentLoaded', () => {
             this.parisZone.classList.add('hidden');
             this.btnArreter.classList.add('hidden');
             this.btnRejouer.classList.remove('hidden');
+
+            this.gorgeesEnJeu = 0;
         }
 
         passerAuJoueurSuivant() {
+            this.gorgeesEnJeu += this.cartesPiocheesCeTour.length;
             this.indexJoueurActuel = (this.indexJoueurActuel + 1) % this.joueurs.length;
             this._afficherMessage(`Tour suivant...`, true);
             setTimeout(() => this.demarrerTour(), 1500);
@@ -333,7 +368,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         mettreAJourInterface() {
             const numCartes = this.cartesPiocheesCeTour.length;
-            this.compteCartesEl.textContent = `Cartes piochées ce tour : ${numCartes}`;
+            this.compteCartesEl.textContent = `Cartes ce tour : ${numCartes} (Total en jeu : ${this.gorgeesEnJeu})`;
+            
             this.statutOseEl.classList.toggle('hidden', !this.aOse);
 
             const btnPlus = document.querySelector("[data-pari='plus']");
@@ -349,11 +385,11 @@ document.addEventListener('DOMContentLoaded', () => {
             this._afficherCartesDeContexte();
 
             const peutArreter = numCartes >= 4 && this.aOse;
-            this.btnArreter.classList.toggle('hidden', !peutArreter);
+            this.btnArreter.classList.toggle('hidden', !peuxArreter);
         }
         
         _afficherCartesEnRangees(groupesDeCartes, elementCible) {
-            elementCible.innerHTML = '<h3>Dernier Tirage</h3>';
+            elementCible.innerHTML = '<h3>Tirage actuel</h3>';
             
             groupesDeCartes.forEach(groupe => {
                 const rangeeEl = document.createElement('div');
@@ -366,7 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         _afficherCartesDeContexte() {
-            this.contexteZoneEl.innerHTML = '<h3>Cartes de Contexte</h3>';
+            this.contexteZoneEl.innerHTML = '<h3>Deux dernières cartes tirées</h3>';
             const numCartes = this.cartesPiocheesCeTour.length;
 
             if (numCartes === 0) {
@@ -383,21 +419,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
         
-        // --- MODIFIÉ : Recrée les <div> de carte au lieu des <img> ---
         _creerElementCarte(carte, estPetite = false) {
             const carteEl = document.createElement('div');
-            // On utilise les classes de votre fichier style.css
             carteEl.className = `carte ${carte.couleur_rb === 'Rouge' ? 'rouge' : 'noir'}`;
             
             if (estPetite) {
-                carteEl.classList.add('petite'); // Le CSS va la rendre plus petite
+                carteEl.classList.add('petite');
             }
 
             const rangEl = document.createElement('strong');
             rangEl.textContent = carte.rang;
             
             const enseigneEl = document.createElement('span');
-            // J'ai corrigé "Trèfle" en "Trefle" pour correspondre au paquet
             enseigneEl.textContent = carte.enseigne; 
 
             carteEl.appendChild(rangEl);
@@ -413,4 +446,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Lancement du jeu ---
     const jeu = new JeuOseJose();
+
 });
