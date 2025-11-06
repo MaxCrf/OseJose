@@ -78,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.pariEnAttente = null;
             this.quantiteEnAttente = 1;
             this.gorgeesEnJeu = 0;
+            this.ambianceStarted = false; // NOUVEAU : Pour s'assurer qu'elle ne se lance qu'une fois
 
             // Pré-chargement des sons
             try {
@@ -124,6 +125,21 @@ document.addEventListener('DOMContentLoaded', () => {
             this.numJoueursInput.addEventListener('change', () => this.majNomsInputs());
             this.btnCommencer.addEventListener('click', () => this.commencerPartie());
             this.majNomsInputs();
+
+            // NOUVEAU : Fonction pour démarrer l'ambiance à la 1ère interaction
+            const startAmbiance = () => {
+                if (!this.ambianceStarted) {
+                    this.sndAmbiance?.play().catch(e => console.log("L'autoplay a été bloqué."));
+                    this.ambianceStarted = true;
+                    // On supprime les écouteurs pour ne pas qu'ils tournent pour rien
+                    this.setupScreen.removeEventListener('click', startAmbiance);
+                    this.setupScreen.removeEventListener('keydown', startAmbiance);
+                }
+            };
+
+            // On écoute le premier clic OU la première touche pressée
+            this.setupScreen.addEventListener('click', startAmbiance);
+            this.setupScreen.addEventListener('keydown', startAmbiance);
         }
 
         majNomsInputs() {
@@ -145,7 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
             this.gameScreen.classList.add('active');
             this.indexJoueurActuel = 0;
 
-            this.sndAmbiance?.play().catch(e => console.log("L'autoplay de l'ambiance a été bloqué."));
+            // SUPPRIMÉ : La musique est déjà lancée (ou tentée)
+            // this.sndAmbiance?.play().catch(e => console.log("L'autoplay..."));
 
             this.demarrerTour();
         }
@@ -384,8 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this._afficherCartesDeContexte();
 
             const peutArreter = numCartes >= 4 && this.aOse;
-            // --- CORRECTION DU BUG ---
-            // 'peuxArreter' a été remplacé par 'peutArreter'
+            // CORRIGÉ : 'peuxArreter' est devenu 'peutArreter'
             this.btnArreter.classList.toggle('hidden', !peutArreter);
         }
         
@@ -448,4 +464,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Lancement du jeu ---
     const jeu = new JeuOseJose();
 
-}); // <-- L'accolade en trop est bien supprimée ici.
+}); // <-- L'accolade en trop est bien supprimée.
