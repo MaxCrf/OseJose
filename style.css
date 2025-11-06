@@ -119,7 +119,6 @@ button:disabled {
     padding-bottom: 15px;
 }
 
-/* NOUVEAU : Style pour les titres des groupes de boutons */
 .groupe-boutons h3 {
     color: var(--couleur-texte);
     margin-top: 0;
@@ -144,9 +143,7 @@ button:disabled {
 #btn-jose-rouge { background-color: var(--couleur-rouge); }
 #btn-jose-noir { background-color: var(--couleur-noir); }
 
-/* --- NOUVEAU : Zone des Cartes (Mise à jour) --- */
-/* On applique le style de base aux 3 conteneurs */
-.cartes-container,
+/* --- Zone des Cartes --- */
 .cartes-container-simple,
 .cartes-container-rangees {
     background-color: var(--couleur-secondaire);
@@ -155,22 +152,19 @@ button:disabled {
     margin: 20px 0;
     min-height: 120px;
 }
-/* Style spécifique pour le contexte */
 .cartes-container-simple {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    min-height: 100px; /* Un peu moins haut */
+    min-height: 100px; 
 }
-/* Style pour les rangées de cartes */
 .carte-rangee {
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 5px;
     margin: 5px auto;
-    /* On utilise la couleur du fond du conteneur parent */
     border-bottom: 1px solid var(--couleur-primaire); 
 }
 .carte-rangee:last-child {
@@ -195,7 +189,6 @@ button:disabled {
     box-sizing: border-box;
 }
 
-/* NOUVEAU : Style pour les petites cartes de contexte */
 .carte.petite {
     width: 60px;
     height: 90px;
