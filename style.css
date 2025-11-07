@@ -1,156 +1,343 @@
-/* --- Configuration Générale --- */
+/*
+ * THÈME : PROXIMA
+ * DESIGN : UX/UI Pro
+ * VIBE : Dark/Light Mode, Multi-Theme, Propre
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+
 :root {
-    --couleur-fond: #1a1a2e;
-    --couleur-carte: #f0f0f0;
-    --couleur-primaire: #16213e;
-    --couleur-secondaire: #0f3460;
-    --couleur-texte: #e94560;
-    --couleur-texte-blanc: #ffffff;
-    --couleur-succes: #4CAF50;
-    --couleur-echec: #f44336;
-    --couleur-rouge: #c0392b;
-    --couleur-noir: #2c3e50;
-    --couleur-ose: #9b59b6;
+    /* Couleurs de base (Mode Sombre par défaut) */
+    --couleur-fond: #12121B;
+    --couleur-primaire: #1C1C2D;
+    --couleur-secondaire: #2A2A3D;
+    --couleur-bordure: #333;
+    --couleur-texte-titre: #FFFFFF;
+    --couleur-texte-corps: #E0E0F0;
+    --couleur-texte-secondaire: #8080A0;
+    --couleur-texte-inverse: #000000;
+    --couleur-noir-pur: #000000;
+    --couleur-blanc-pur: #FFFFFF;
+    
+    /* Couleurs d'accent (Bleu par défaut) */
+    --couleur-accent: #3088FF; /* Principal (Arrêter) */
+    --couleur-ose-accent: #00A3FF; /* Osé (plus vif) */
+    --couleur-quantite-1: #A0C8FF;
+    --couleur-quantite-2: #60A5FF;
+    --couleur-quantite-3: #3088FF;
+    
+    /* Statuts (fixes) */
+    --couleur-succes: #00FF6A;
+    --couleur-echec: #E63946; /* Un rouge plus pur */
+    --couleur-rouge-carte: #E63946;
+    --couleur-noir-carte-dark: #FFFFFF;
+    --couleur-noir-carte-light: #1A1A33;
 }
 
+/* NOUVEAU : Mode Clair */
+body.light-mode {
+    --couleur-fond: #F0F2F9;
+    --couleur-primaire: #FFFFFF;
+    --couleur-secondaire: #E9ECF5;
+    --couleur-bordure: #E0E0F0;
+    --couleur-texte-titre: #1A1A33;
+    --couleur-texte-corps: #33334A;
+    --couleur-texte-secondaire: #7B7B9A;
+    --couleur-texte-inverse: #FFFFFF;
+}
+
+/* --- Palettes de thèmes (remplacent les accents) --- */
+body[data-theme="proxima-rouge"] {
+    --couleur-accent: #E63946;
+    --couleur-ose-accent: #E63946;
+    --couleur-quantite-1: #F1A0A6;
+    --couleur-quantite-2: #EE767F;
+    --couleur-quantite-3: #E63946;
+}
+body[data-theme="proxima-rose"] {
+    --couleur-accent: #FF66CC;
+    --couleur-ose-accent: #FF66CC;
+    --couleur-quantite-1: #FFCCE6;
+    --couleur-quantite-2: #FF99E6;
+    --couleur-quantite-3: #FF66CC;
+}
+body[data-theme="proxima-orange"] {
+    --couleur-accent: #FF8A00;
+    --couleur-ose-accent: #FF8A00;
+    --couleur-quantite-1: #FFD466;
+    --couleur-quantite-2: #FFB700;
+    --couleur-quantite-3: #FF8A00;
+}
+body[data-theme="proxima-vert"] {
+    --couleur-accent: #2DD4BF;
+    --couleur-ose-accent: #2DD4BF;
+    --couleur-quantite-1: #A3F7EA;
+    --couleur-quantite-2: #66E9D6;
+    --couleur-quantite-3: #2DD4BF;
+}
+body[data-theme="proxima-jaune"] {
+    --couleur-accent: #F4D35E;
+    --couleur-ose-accent: #F4D35E;
+    --couleur-quantite-1: #FBF0CA;
+    --couleur-quantite-2: #FAE5A0;
+    --couleur-quantite-3: #F4D35E;
+}
+body[data-theme="proxima-violet"] {
+    --couleur-accent: #A78BFA;
+    --couleur-ose-accent: #A78BFA;
+    --couleur-quantite-1: #E3DBFD;
+    --couleur-quantite-2: #C9B8FC;
+    --couleur-quantite-3: #A78BFA;
+}
+body[data-theme="proxima-blanc"] {
+    --couleur-accent: #FFFFFF;
+    --couleur-ose-accent: #FFFFFF;
+    --couleur-quantite-1: #E0E0E0;
+    --couleur-quantite-2: #F0F0F0;
+    --couleur-quantite-3: #FFFFFF;
+}
+
+/* --- Base de l'application (anti-défilement) --- */
+html { height: 100%; }
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Inter', sans-serif;
     background-color: var(--couleur-fond);
-    color: var(--couleur-texte-blanc);
+    color: var(--couleur-texte-corps);
     margin: 0;
-    padding: 20px;
+    padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    height: 100dvh;
     text-align: center;
+    overflow: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-h1, h2, h3 {
-    color: var(--couleur-texte);
-    margin-top: 0;
-}
-
-/* --- Structure des Écrans --- */
+/* --- Structure de l'application --- */
 .ecran {
-    background-color: var(--couleur-primaire);
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    width: 90%;
+    background-color: var(--couleur-fond);
+    padding: 15px 10px;
+    width: 100%;
     max-width: 800px;
-    display: none; /* Caché par défaut */
+    margin: 0 auto;
+    display: none;
+    box-sizing: border-box;
+    position: relative;
+    transition: background-color 0.3s ease;
 }
-
 .ecran.active {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+}
+.hidden { display: none !important; }
+
+/* --- Typographie Professionnelle --- */
+h1 {
+    font-size: 2.5em;
+    font-weight: 900;
+    margin: 0 0 5px 0;
+    color: var(--couleur-texte-titre);
+    transition: color 0.3s ease;
+}
+.subtitle {
+    color: var(--couleur-texte-secondaire);
+    font-size: 1em;
+    font-weight: 700;
+    margin: 0 0 15px 0;
+}
+h2 {
+    color: var(--couleur-texte-titre);
+    font-weight: 700;
+    font-size: 1.1em;
+    margin: 5px 0;
+    transition: color 0.3s ease;
+}
+h3 {
+    color: var(--couleur-texte-secondaire);
+    font-weight: 700;
+    border-bottom: 1px solid var(--couleur-bordure);
+    padding-bottom: 5px;
+    text-transform: uppercase;
+    font-size: 0.8em;
+    letter-spacing: 0.5px;
+    margin: 10px 0 5px 0;
+    transition: border-color 0.3s ease;
+}
+p {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+#compte-cartes {
+    font-size: 0.9em;
+    color: var(--couleur-texte-secondaire);
+}
+#statut-ose {
+    color: var(--couleur-ose-accent); /* Couleur "Osé" */
+    font-weight: 700;
+    transition: color 0.3s ease;
 }
 
-.hidden {
-    display: none !important;
+/* --- Zone de Défilement (Centre) --- */
+#card-display-wrapper {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: var(--couleur-primaire);
+    border-radius: 12px;
+    border: 1px solid var(--couleur-bordure);
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
+#card-display-wrapper::-webkit-scrollbar { display: none; }
 
-/* --- Écran de Configuration --- */
-#setup-screen .input-groupe {
-    margin: 20px 0;
+/* --- Zones Ancrées (Haut et Bas) - Compactées --- */
+#info-zone, #message-zone, #paris-zone, #action-zone {
+    flex-shrink: 0;
+    width: 100%;
 }
+#info-zone { 
+    padding-bottom: 5px; 
+    padding-top: 30px; 
+}
+#paris-zone { padding-top: 5px; }
+
+/* --- Configuration (Inputs) --- */
+#setup-screen .input-groupe { margin: 15px 0; }
 #setup-screen label {
     display: block;
     margin-bottom: 8px;
-    font-size: 1.1em;
-}
-#setup-screen input {
-    padding: 10px;
-    border-radius: 6px;
-    border: none;
     font-size: 1em;
-    width: 80px;
-    text-align: center;
+    color: var(--couleur-texte-secondaire);
 }
-#noms-joueurs-container input {
+#setup-screen input[type="number"], #noms-joueurs-container input[type="text"] {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--couleur-bordure);
+    background-color: var(--couleur-secondaire);
+    color: var(--couleur-texte-titre);
+    font-family: 'Inter', sans-serif;
+    font-size: 1em;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+#setup-screen input[type="number"]:focus, #noms-joueurs-container input[type="text"]:focus {
+    border-color: var(--couleur-accent);
+    box-shadow: 0 0 10px var(--couleur-accent);
+    outline: none;
+}
+#setup-screen input[type="number"] { width: 80px; }
+#noms-joueurs-container input[type="text"] {
     display: block;
-    margin: 10px auto;
+    margin: 8px auto;
     width: 60%;
     max-width: 300px;
 }
 
-/* --- Boutons Généraux --- */
+/* --- Boutons "PROXIMA" --- */
 button {
     cursor: pointer;
     border: none;
     border-radius: 8px;
-    padding: 12px 20px;
-    font-size: 1em;
-    font-weight: bold;
+    padding: 10px 14px;
+    font-size: 0.85em;
+    font-weight: 700;
     transition: all 0.2s ease;
-    margin: 5px;
+    margin: 3px;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
+}
+button:not(:disabled):hover {
+    transform: translateY(-2px);
+    filter: brightness(1.2);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+button:not(:disabled):active {
+    transform: scale(0.96);
+    transition: transform 0.1s;
+    filter: brightness(0.9);
 }
 button:disabled {
+    background-color: var(--couleur-secondaire) !important;
+    color: var(--couleur-texte-secondaire) !important;
     opacity: 0.5;
+    box-shadow: none;
     cursor: not-allowed;
 }
 
-.btn-principal {
-    background-color: var(--couleur-texte);
-    color: var(--couleur-texte-blanc);
-}
-.btn-principal:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
-}
-.btn-action {
-    background-color: var(--couleur-succes);
-    color: white;
-}
-#btn-rejouer {
-    background-color: var(--couleur-echec);
-}
-
-/* --- Écran de Jeu --- */
-#info-zone #statut-ose {
-    color: var(--couleur-ose);
-    font-weight: bold;
-}
-
-/* --- Boutons de Pari (avec ajout H3) --- */
-.groupe-boutons {
-    margin-bottom: 15px;
-    border-bottom: 1px solid var(--couleur-secondaire);
-    padding-bottom: 15px;
-}
-
-.groupe-boutons h3 {
-    color: var(--couleur-texte);
-    margin-top: 0;
-    margin-bottom: 10px;
-    border-bottom: 1px solid var(--couleur-secondaire);
-    padding-bottom: 5px;
-}
-
+/* Boutons de base (discrets) */
 .btn-pari {
     background-color: var(--couleur-secondaire);
-    color: var(--couleur-texte-blanc);
+    color: var(--couleur-texte-secondaire);
 }
-.btn-pari:hover {
-    background-color: #0f3460c5;
-}
-.btn-pari.ose {
-    background-color: var(--couleur-ose);
-}
-.btn-pari.ose:hover {
-    background-color: #8e44ad;
-}
-#btn-jose-rouge { background-color: var(--couleur-rouge); }
-#btn-jose-noir { background-color: var(--couleur-noir); }
 
-/* --- Zone des Cartes --- */
+/* Boutons Rouge/Noir (Lisibilité maximale) */
+button[data-pari="rouge"], #btn-jose-rouge {
+    background-color: var(--couleur-echec);
+    color: var(--couleur-blanc-pur);
+}
+/* Mode Clair : le bouton "Noir" s'inverse */
+button[data-pari="noir"], #btn-jose-noir {
+    background-color: var(--couleur-texte-titre);
+    color: var(--couleur-fond);
+}
+
+/* Boutons "Osé" (Accent Osé) */
+.btn-pari.ose {
+    background-color: var(--couleur-ose-accent);
+    color: var(--couleur-texte-inverse);
+    box-shadow: 0 4px 15px rgba(0,0,0, 0.2);
+}
+/* Thème Blanc : Texte Noir sur bouton blanc */
+body[data-theme="proxima-blanc"] .btn-pari.ose,
+body[data-theme="proxima-blanc"] .btn-principal {
+    color: var(--couleur-noir-pur);
+}
+
+
+/* Boutons Principaux (Accent Principal) */
+.btn-principal {
+    background-color: var(--couleur-accent);
+    color: var(--couleur-texte-inverse);
+    padding: 12px 20px;
+    font-size: 0.9em;
+    box-shadow: 0 4px 15px rgba(0,0,0, 0.2);
+}
+
+/* Bouton Rejouer */
+#btn-rejouer {
+    background-color: var(--couleur-echec);
+    color: var(--couleur-texte-titre);
+}
+
+/* Boutons de Quantité colorés */
+.btn-quantite[data-q="1"] { background-color: var(--couleur-quantite-1); color: var(--couleur-noir-pur); }
+.btn-quantite[data-q="2"] { background-color: var(--couleur-quantite-2); color: var(--couleur-noir-pur); }
+.btn-quantite[data-q="3"] { background-color: var(--couleur-accent); color: var(--couleur-texte-inverse); }
+
+/* Thème Blanc : Texte Noir sur boutons quantité */
+body[data-theme="proxima-blanc"] .btn-quantite {
+    color: var(--couleur-noir-pur);
+}
+
+
+.groupe-boutons {
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--couleur-bordure);
+}
+.groupe-boutons:last-child { border-bottom: none; }
+
+/* --- Cartes --- */
 .cartes-container-simple,
 .cartes-container-rangees {
-    background-color: var(--couleur-secondaire);
-    border-radius: 8px;
-    padding: 15px;
-    margin: 20px 0;
-    min-height: 120px;
+    background-color: transparent;
+    padding: 0;
+    margin: 0 0 10px 0;
+    min-height: 110px;
+    border: none;
 }
 .cartes-container-simple {
     display: flex;
@@ -163,76 +350,195 @@ button:disabled {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 5px;
-    margin: 5px auto;
-    border-bottom: 1px solid var(--couleur-primaire); 
+    padding: 2px 0;
+    margin: 0;
+    animation: card-fade-in 0.4s ease-out forwards;
+    opacity: 0;
 }
-.carte-rangee:last-child {
-    border-bottom: none;
+.carte-rangee { animation-delay: 0.1s; }
+.carte-rangee:nth-child(2) { animation-delay: 0.2s; }
+.carte-rangee:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes card-fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .carte {
-    background-color: var(--couleur-carte);
-    border-radius: 6px;
-    border: 1px solid #ccc;
+    background-color: var(--couleur-primaire);
+    border-radius: 8px;
+    border: 1px solid var(--couleur-bordure);
     width: 80px;
     height: 110px;
     margin: 5px;
     padding: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    font-weight: bold;
+    font-weight: 700;
     font-size: 1.2em;
     box-sizing: border-box;
+    transition: all 0.3s ease;
 }
-
 .carte.petite {
     width: 60px;
     height: 90px;
     font-size: 1em;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
-
 .carte.rouge {
-    color: var(--couleur-rouge);
+    color: var(--couleur-rouge-carte);
+    border-color: var(--couleur-rouge-carte);
 }
 .carte.noir {
-    color: var(--couleur-noir);
+    color: var(--couleur-noir-carte-dark); /* Par défaut, couleur du mode sombre */
 }
-.carte span {
-    font-size: 0.8em;
-    margin-top: 5px;
-}
-
-/* --- Zone des Messages --- */
-#message-zone {
-    min-height: 80px;
-}
-#message-texte.succes {
-    color: var(--couleur-succes);
-}
-#message-texte.echec {
-    color: var(--couleur-echec);
+body.light-mode .carte.noir {
+    color: var(--couleur-noir-carte-light); /* En mode clair, le texte est sombre */
 }
 
-/* --- Modal "José" --- */
+
+/* --- Messages d'impact (propres) --- */
+#message-zone { min-height: 40px; }
+#message-texte {
+    font-size: 1.2em;
+    font-weight: 700;
+    transform: scale(0.8);
+    opacity: 0;
+    transition: all 0.3s ease-out;
+}
+#message-texte.succes, #message-texte.echec {
+    transform: scale(1);
+    opacity: 1;
+}
+#message-texte.succes { color: var(--couleur-succes); }
+#message-texte.echec { color: var(--couleur-echec); }
+
+/* --- Boutons d'icône (Règles/Paramètres) --- */
+.header-icons {
+    position: absolute;
+    top: 15px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 100;
+}
+.btn-icon {
+    background: var(--couleur-secondaire);
+    color: var(--couleur-texte-secondaire);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    font-size: 1.2em;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+.btn-icon:hover {
+    color: var(--couleur-texte-titre);
+}
+
+/* --- Modals "PROXIMA" --- */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    backdrop-filter: blur(8px);
 }
+.modal.hidden { display: none; }
 .modal-contenu {
     background-color: var(--couleur-primaire);
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid var(--couleur-bordure);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: modal-pop-in 0.3s ease-out;
+    position: relative;
+    width: 90%;
+    max-width: 500px;
+    box-sizing: border-box;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+.modal-large {
+    text-align: left;
+}
+.modal-large ul { padding-left: 20px; }
+.modal-large li { margin-bottom: 10px; font-size: 0.9em; }
+.modal-large h4 { margin-top: 15px; color: var(--couleur-accent); }
+.modal-large p { font-size: 0.9em; }
+
+.btn-close-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--couleur-secondaire);
+    color: var(--couleur-texte-secondaire);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    font-size: 1em;
+    line-height: 30px;
+}
+
+/* Slider de Volume */
+.input-groupe { margin: 15px 0; }
+.input-groupe label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    color: var(--couleur-texte-secondaire);
+}
+#volume-slider {
+    width: 100%;
+    cursor: pointer;
+    accent-color: var(--couleur-accent);
+}
+#btn-toggle-mode {
+    width: 100%;
+}
+.btn-menu {
+    width: 100%;
+    margin-top: 15px;
+    background-color: var(--couleur-secondaire);
+    color: var(--couleur-texte-secondaire);
+}
+
+/* Boutons de Thème */
+.theme-buttons {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+.theme-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--couleur-secondaire);
+    padding: 0;
+}
+.theme-btn:hover {
+    border-color: var(--couleur-texte-titre);
+}
+
+@keyframes modal-pop-in {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Crédits sur l'écran d'accueil */
+.credits {
+    margin-top: 30px;
+    color: var(--couleur-texte-secondaire);
+    font-size: 0.8em;
 }
