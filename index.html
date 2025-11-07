@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Osé José - Le Jeu</title> 
+    <title>Osé José - PROXIMA</title> 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     
     <div id="setup-screen" class="ecran active">
         <h1>Osé José !</h1>
-        <p>L'extermination va commencer.</p>
+        <p class="subtitle">~ L' EXTERMINATION VA COMMENCER ~</p>
         
         <div class="input-groupe">
             <label for="num-joueurs">Combien de joueurs ?</label>
@@ -21,22 +24,32 @@
             </div>
         
         <button id="btn-commencer" class="btn-principal">Commencer la partie</button>
+        
+        <footer class="credits">
+            <p>Un jeu par Carfantan Maxence, Nonnotte Matthis & Rivet Eliot</p>
+        </footer>
     </div>
 
     <div id="game-screen" class="ecran">
         
+        <div class="header-icons">
+            <button id="btn-regles" class="btn-icon">?</button>
+            <button id="btn-parametres" class="btn-icon">⚙️</button>
+        </div>
+
         <div id="info-zone">
             <h2 id="nom-joueur-actuel">C'est au tour de...</h2>
-            <p id="compte-cartes">Cartes ce tour : 0 (Total en jeu : 0)</p>
+            <p id="compte-cartes">Gorgées ce tour : 0 | Total en jeu : 0</p>
             <p id="statut-ose" class="hidden">Vous avez "Osé" !</p>
         </div>
 
-        <div id="contexte-zone" class="cartes-container-simple">
-            <h3>Deux dernières cartes tirées</h3>
-        </div>
-
-        <div id="dernier-tirage-zone" class="cartes-container-rangees">
-            <h3>Tirage actuel</h3>
+        <div id="card-display-wrapper">
+            <div id="contexte-zone" class="cartes-container-simple">
+                <h3>Deux dernières cartes tirées</h3>
+            </div>
+            <div id="dernier-tirage-zone" class="cartes-container-rangees">
+                <h3>Tirage actuel</h3>
+            </div>
         </div>
         
         <div id="message-zone">
@@ -65,7 +78,6 @@
         <div id="action-zone">
             <button id="btn-arreter" class="btn-principal hidden">Arrêter et passer</button>
         </div>
-
     </div>
     
     <div id="quantite-modal" class="modal hidden">
@@ -83,6 +95,59 @@
             <p>Annoncez la couleur de la 3ème carte :</p>
             <button id="btn-jose-rouge" class="btn-pari">Rouge</button>
             <button id="btn-jose-noir" class="btn-pari">Noir</button>
+        </div>
+    </div>
+
+    <div id="regles-modal" class="modal hidden">
+        <div class="modal-contenu modal-large">
+            <button class="btn-close-modal" id="btn-close-regles">X</button>
+            <h3>Règles du Osé José</h3>
+            <ul>
+                <li>Le but est de piocher des cartes sans se tromper.</li>
+                <li>Si vous réussissez un pari, vous pouvez continuer ou passer au joueur suivant.</li>
+                <li>Pour avoir le droit de passer, vous devez avoir pioché au moins 4 cartes ET avoir réussi au moins un pari "Osé" (Purple, José, ou Osé José).</li>
+                <li>Si vous passez, les gorgées de votre tour s'ajoutent au "Total en jeu".</li>
+                <li>Si vous échouez un pari, vous buvez le Total en jeu + les gorgées de votre tour. Le total retombe à 0.</li>
+                <li>Le joueur qui perd est obligé de rejouer son tour.</li>
+            </ul>
+            <h4>Paris "Osé"</h4>
+            <p><b>Purple :</b> Pioche 2 cartes. Réussi si c'est 1 carte d'une couleur et 1 carte de l'autre.</p>
+            <p><b>José :</b> Pioche 3 cartes. Réussi si les 2 premières sont un Purple ET la 3ème est de la couleur annoncée.</p>
+            <p><b>Osé José :</b> Pioche 4 cartes. Réussi si c'est 3 carte d'une couleur et 1 carte de l'autre.</p>
+            <p><b>Simple, Double, Triple :</b> Multiplie par 1/2/3 fois le Purple ou le Osé José.</p>
+        </div>
+    </div>
+
+    <div id="parametres-modal" class="modal hidden">
+        <div class="modal-contenu">
+            <button class="btn-close-modal" id="btn-close-parametres">X</button>
+            <h3>Paramètres</h3>
+
+            <div class="input-groupe">
+                <label>Mode</label>
+                <button id="btn-toggle-mode" class="btn-pari">Passer en Mode Clair</button>
+            </div>
+
+            <div class="input-groupe">
+                <label for="volume-slider">Volume</label>
+                <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.5">
+            </div>
+
+            <div class="input-groupe">
+                <label>Thème de couleur</label>
+                <div class="theme-buttons">
+                    <button class="theme-btn" data-theme="proxima-bleu" style="background-color: #00A3FF;"></button>
+                    <button class="theme-btn" data-theme="proxima-rouge" style="background-color: #E63946;"></button>
+                    <button class="theme-btn" data-theme="proxima-rose" style="background-color: #FF66CC;"></button>
+                    <button class="theme-btn" data-theme="proxima-orange" style="background-color: #FF8A00;"></button>
+                    <button class="theme-btn" data-theme="proxima-vert" style="background-color: #2DD4BF;"></button>
+                    <button class="theme-btn" data-theme="proxima-jaune" style="background-color: #F4D35E;"></button>
+                    <button class="theme-btn" data-theme="proxima-violet" style="background-color: #A78BFA;"></button>
+                    <button class="theme-btn" data-theme="proxima-blanc" style="background-color: #FFFFFF;"></button>
+                </div>
+            </div>
+
+            <button id="btn-menu-principal" class="btn-principal btn-menu">Retour au Menu</button>
         </div>
     </div>
 
